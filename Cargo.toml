@@ -17,10 +17,14 @@ x86_64 = "0.14.2"
 # This allows the VM to exit in a development environment
 [package.metadata.bootimage]
 test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04"]
+# `cargo test` considers all error codes other that 0 as failures
+# this allows to map our specific code to the correct one
+test-success-exit-code = 33         # (0x10 << 1) | 1
 
 [dependencies.lazy_static]
 version = "1.0"
 features = ["spin_no_std"]
+
 
 # Since the panic strategy is specified in the os JSON file, we don't need to specify it here.
 # the profile used for `cargo build`
