@@ -8,10 +8,14 @@ name = "p0nd_os"
 test = false
 bench = false
 
+[dependencies]
+bootloader = "0.9"
+
+# Since the panic strategy is specified in the os JSON file, we don't need to specify it here.
 # the profile used for `cargo build`
-[profile.dev]
-panic = "abort" # disable stack unwinding on panic
+# [profile.dev]
+# panic = "abort" # disable stack unwinding on panic
 
 # the profile used for `cargo build --release`
-[profile.release]
-panic = "abort" # disable stack unwinding on panic
+# [profile.release]
+# panic = "abort" # disable stack unwinding on panic
