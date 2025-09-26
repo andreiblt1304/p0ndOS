@@ -10,6 +10,7 @@ bench = false
 
 [dependencies]
 bootloader = "0.9"
+volatile = "0.2.6"
 
 # Since the panic strategy is specified in the os JSON file, we don't need to specify it here.
 # the profile used for `cargo build`
