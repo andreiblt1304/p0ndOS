@@ -1,12 +1,21 @@
 use core::fmt;
 
+use lazy_static::lazy_static;
 use volatile::Volatile;
 
-pub static WRITER: Writer = Writer {
-    column_position: 0,
-    color_code: ColorCode::new(Color::Green, Color::Black),
-    buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-};
+use spin::Mutex;
+
+// The static Writer would be automatically immutable, thus pretty much useless
+// `static mut` is highly discouraged, RefCell/ UnsafeCell are not Sync so unusable
+// Since the normal `Mutex` can't be used in this OS,
+// We will use the most basic type of Mutex, `spinlock`
+lazy_static! {
+    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Green, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    });
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
