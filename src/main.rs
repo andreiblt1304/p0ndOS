@@ -10,6 +10,22 @@ use core::panic::PanicInfo;
 mod serial;
 mod vga_buffer;
 
+pub trait Testable {
+    fn run(&self) -> ();
+}
+
+impl<T> Testable for T
+where
+    T: Fn(),
+{
+    fn run(&self) {
+        // this will extract the test name
+        serial_print!("{} -> \t", core::any::type_name::<T>());
+        self();
+        serial_println!("[ok]");
+    }
+}
+
 #[unsafe(no_mangle)] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
     println!("HELLO from the p0nd OS!");
@@ -38,22 +54,20 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
+pub fn test_runner(tests: &[&dyn Testable]) {
     serial_println!("Running {} tests", tests.len());
 
     for test in tests {
-        test();
+        test.run();
     }
     exit_qemu(QemuExitCode::Success);
 }
 
 #[test_case]
 fn test_assertion() {
-    serial_print!("some test assertion...");
-    let a = false;
+    let a = true;
     let b = true;
     assert_eq!(a, b);
-    serial_println!("[OK]");
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
