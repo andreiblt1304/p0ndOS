@@ -17,7 +17,7 @@ uart_16550 = "0.2.0"
 
 # This allows the VM to exit in a development environment
 [package.metadata.bootimage]
-test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio"]
+test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio", "-display", "none"]
 # `cargo test` considers all error codes other that 0 as failures
 # this allows to map our specific code to the correct one
 test-success-exit-code = 33         # (0x10 << 1) | 1
