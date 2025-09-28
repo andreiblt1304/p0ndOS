@@ -7,6 +7,7 @@
 
 use core::panic::PanicInfo;
 
+mod serial;
 mod vga_buffer;
 
 #[unsafe(no_mangle)] // don't mangle the name of this function
@@ -27,7 +28,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[cfg(test)]
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
+    serial_println!("Running {} tests", tests.len());
 
     for test in tests {
         test();
@@ -37,11 +38,11 @@ pub fn test_runner(tests: &[&dyn Fn()]) {
 
 #[test_case]
 fn test_assertion() {
-    print!("some test assertion...");
+    serial_print!("some test assertion...");
     let a = true;
     let b = true;
     assert_eq!(a, b);
-    println!("[OK]");
+    serial_println!("[OK]");
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
