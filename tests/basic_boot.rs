@@ -6,6 +6,8 @@
 
 use core::panic::PanicInfo;
 
+use p0nd_os::println;
+
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     test_main();
@@ -16,4 +18,9 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     p0nd_os::test_panic_handler(info)
+}
+
+#[test_case]
+fn test_println() {
+    println!("test_println output");
 }
