@@ -11,9 +11,13 @@ use p0nd_os::println;
 pub extern "C" fn _start() -> ! {
     println!("HELLO from the p0nd OS!");
 
+    p0nd_os::init();
+    x86_64::instructions::interrupts::int3();
+
     #[cfg(test)]
     test_main();
 
+    println!("Nothing happened");
     loop {}
 }
 
