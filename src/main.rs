@@ -17,10 +17,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("Nothing happened");
-    loop {
-        use p0nd_os::print;
-        print!("-");
-    }
+    p0nd_os::hlt_loop();
 }
 
 #[cfg(not(test))]
@@ -28,7 +25,7 @@ pub extern "C" fn _start() -> ! {
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
 
-    loop {}
+    p0nd_os::hlt_loop();
 }
 
 #[cfg(test)]

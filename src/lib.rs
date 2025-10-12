@@ -25,7 +25,7 @@ pub extern "C" fn _start() -> ! {
     init();
     test_main();
 
-    loop {}
+    hlt_loop();
 }
 
 pub trait Testable {
@@ -44,6 +44,13 @@ where
     }
 }
 
+// halts the CPU until the next interrupt arrives
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
+}
+
 pub fn test_runner(tests: &[&dyn Testable]) {
     serial_println!("Running {} tests", tests.len());
     for test in tests {
@@ -58,7 +65,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
 
-    loop {}
+    hlt_loop();
 }
 
 #[cfg(test)]
