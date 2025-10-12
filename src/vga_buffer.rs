@@ -177,13 +177,18 @@ pub fn _print(args: fmt::Arguments) {
 }
 
 #[test_case]
-fn test_println_simple() {
-    let s = "I am a test string and I fit on one line";
-    println!("{}", s);
+fn test_println_output() {
+    use core::fmt::Write;
+    use x86_64::instructions::interrupts;
 
-    for (i, c) in s.chars().enumerate() {
-        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+    let s = "Some test string that fits on a single line";
+    interrupts::without_interrupts(|| {
+        let mut writer = WRITER.lock();
+        writeln!(writer, "\n{}", s).expect("writeln failed");
 
-        assert_eq!(char::from(screen_char.ascii_character), c);
-    }
+        for (i, c) in s.chars().enumerate() {
+            let screen_char = writer.buffer.chars[BUFFER_HEIGHT - 2][i].read();
+            assert_eq!(char::from(screen_char.ascii_character), c);
+        }
+    });
 }
