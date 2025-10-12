@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
-use crate::{gdt, println};
+use crate::{gdt, print, println};
 
 // range 32-47 is chosen because there are the first free number after 32 exception slots
 pub const PIC_1_OFFSET: u8 = 32;
@@ -15,6 +15,7 @@ pub static PICS: spin::Mutex<ChainedPics> =
 #[repr(u8)]
 pub enum InterruptIndex {
     Timer = PIC_1_OFFSET,
+    Keyboard,
 }
 
 impl InterruptIndex {
@@ -39,17 +40,51 @@ lazy_static! {
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX); // set the stack index for double fault handler
         }
         idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
+        idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
 
         idt
     };
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    println!(".");
+    print!(".");
 
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
+    }
+}
+
+extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStackFrame) {
+    use x86_64::instructions::port::Port;
+
+    let mut port = Port::new(0x60);
+    let scancode: u8 = unsafe { port.read() };
+
+    let key = get_corresponding_key(scancode);
+    if let Some(key) = key {
+        print!("{}", key);
+    }
+
+    unsafe {
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Keyboard.as_u8());
+    }
+}
+
+fn get_corresponding_key(scancode: u8) -> Option<char> {
+    match scancode {
+        0x02 => Some('1'),
+        0x03 => Some('2'),
+        0x04 => Some('3'),
+        0x05 => Some('4'),
+        0x06 => Some('5'),
+        0x07 => Some('6'),
+        0x08 => Some('7'),
+        0x09 => Some('8'),
+        0x0a => Some('9'),
+        0x0b => Some('0'),
+        _ => None,
     }
 }
 
