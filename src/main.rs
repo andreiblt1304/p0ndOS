@@ -4,18 +4,27 @@
 #![test_runner(p0nd_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
 use p0nd_os::println;
 
-#[unsafe(no_mangle)] // don't mangle the name of this function
-pub extern "C" fn _start() -> ! {
-    println!("HELLO from the p0nd OS!");
+// type-checked way to define the function as the kernel entry point
+entry_point!(kernel_main);
 
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use p0nd_os::memory::active_level_4_table;
+    use x86_64::VirtAddr;
+
+    println!("HELLO from the p0nd OS!");
     p0nd_os::init();
 
-    let ptr = 0xdeadbeaf as *mut u8;
-    unsafe {
-        *ptr = 42;
+    let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let l4_table = unsafe { active_level_4_table(physical_memory_offset) };
+
+    for (i, entry) in l4_table.iter().enumerate() {
+        if !entry.is_unused() {
+            println!("L4 entry {}: {:?}", i, entry);
+        }
     }
 
     #[cfg(test)]
