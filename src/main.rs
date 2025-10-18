@@ -12,32 +12,29 @@ use p0nd_os::println;
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use p0nd_os::memory::active_level_4_table;
+    use p0nd_os::memory::translate_address_wrapper;
     use x86_64::VirtAddr;
 
     println!("HELLO from the p0nd OS!");
     p0nd_os::init();
 
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let l4_table = unsafe { active_level_4_table(physical_memory_offset) };
+    let addresses = [
+        // the identity-mapped vga buffer page
+        0xb8000,
+        // some code page
+        0x201008,
+        // some stack page
+        0x0100_0020_1a10,
+        // virtual address mapped to physical address 0
+        boot_info.physical_memory_offset,
+    ];
+    for &address in &addresses {
+        let virtual_address = VirtAddr::new(address);
+        let physical_address =
+            unsafe { translate_address_wrapper(virtual_address, physical_memory_offset) };
 
-    for (i, entry) in l4_table.iter().enumerate() {
-        use x86_64::structures::paging::PageTable;
-
-        if !entry.is_unused() {
-            println!("L4 entry {}: {:?}", i, entry);
-
-            let physical_address = entry.frame().unwrap().start_address();
-            let virtual_address = boot_info.physical_memory_offset + physical_address.as_u64();
-            let ptr = VirtAddr::new(virtual_address).as_mut_ptr();
-            let l3_table: &PageTable = unsafe { &*ptr };
-
-            for (i, entry) in l3_table.iter().enumerate() {
-                if !entry.is_unused() {
-                    println!("  L3 Entry {}: {:?}", i, entry);
-                }
-            }
-        }
+        println!("{:?} -> {:?}", virtual_address, physical_address);
     }
 
     #[cfg(test)]
