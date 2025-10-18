@@ -6,14 +6,14 @@
 
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
-use p0nd_os::{memory, println};
-use x86_64::structures::paging::Translate;
+use p0nd_os::println;
 
 // type-checked way to define the function as the kernel entry point
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use x86_64::VirtAddr;
+    use p0nd_os::memory;
+    use x86_64::{VirtAddr, structures::paging::Translate};
 
     println!("HELLO from the p0nd OS!");
     p0nd_os::init();
@@ -32,6 +32,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     ];
     for &address in &addresses {
         let virtual_address = VirtAddr::new(address);
+        // the x86 crate function also provides translation for huge pages
         let physical_address = mapper.translate_addr(virtual_address);
 
         println!("{:?} -> {:?}", virtual_address, physical_address);
