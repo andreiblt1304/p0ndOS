@@ -7,35 +7,28 @@
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
 use p0nd_os::println;
+use x86_64::structures::paging::Page;
 
 // type-checked way to define the function as the kernel entry point
 entry_point!(kernel_main);
 
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use p0nd_os::memory;
-    use x86_64::{VirtAddr, structures::paging::Translate};
+    use x86_64::VirtAddr;
 
     println!("HELLO from the p0nd OS!");
     p0nd_os::init();
 
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let mapper = unsafe { memory::init(physical_memory_offset) };
-    let addresses = [
-        // the identity-mapped vga buffer page
-        0xb8000,
-        // some code page
-        0x201008,
-        // some stack page
-        0x0100_0020_1a10,
-        // virtual address mapped to physical address 0
-        boot_info.physical_memory_offset,
-    ];
-    for &address in &addresses {
-        let virtual_address = VirtAddr::new(address);
-        // the x86 crate function also provides translation for huge pages
-        let physical_address = mapper.translate_addr(virtual_address);
+    let mut mapper = unsafe { memory::init(physical_memory_offset) };
+    let mut frame_allocator = memory::EmptyFrameAllocator;
 
-        println!("{:?} -> {:?}", virtual_address, physical_address);
+    let page = Page::containing_address(VirtAddr::zero());
+    memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
+
+    let page_ptr: *mut u64 = page.start_address().as_mut_ptr();
+    unsafe {
+        page_ptr.offset(400).write_volatile(0x_f021_f077_f065_f04e);
     }
 
     #[cfg(test)]
