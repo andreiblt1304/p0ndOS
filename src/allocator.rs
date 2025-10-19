@@ -3,6 +3,7 @@ use core::{
     ptr::null_mut,
 };
 
+use linked_list_allocator::LockedHeap;
 use x86_64::{
     VirtAddr,
     structures::paging::{
@@ -14,7 +15,7 @@ pub const HEAP_START: usize = 0x_4444_4444_0000;
 pub const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
 
 #[global_allocator]
-static ALLOCATOR: Dummy = Dummy;
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 pub struct Dummy;
 
@@ -47,6 +48,10 @@ pub fn init_heap(
 
         let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE;
         unsafe { mapper.map_to(page, frame, flags, frame_allocator)?.flush() }
+    }
+
+    unsafe {
+        ALLOCATOR.lock().init(HEAP_START, HEAP_SIZE);
     }
 
     Ok(())
