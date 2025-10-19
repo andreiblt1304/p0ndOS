@@ -6,7 +6,7 @@
 
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
-use p0nd_os::println;
+use p0nd_os::{memory::BootInfoFrameAllocator, println};
 use x86_64::structures::paging::Page;
 
 // type-checked way to define the function as the kernel entry point
@@ -21,7 +21,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(physical_memory_offset) };
-    let mut frame_allocator = memory::EmptyFrameAllocator;
+    let mut frame_allocator = unsafe { BootInfoFrameAllocator::init(&boot_info.memory_map) };
 
     let page = Page::containing_address(VirtAddr::zero());
     memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
