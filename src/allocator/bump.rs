@@ -3,9 +3,7 @@ use core::{
     ptr,
 };
 
-use linked_list_allocator::align_up;
-
-use crate::allocator::Locked;
+use crate::allocator::{Locked, align_up};
 
 pub struct BumpAllocator {
     heap_start: usize,
