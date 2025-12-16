@@ -31,6 +31,10 @@ version = "0.3.11"
 default-features = false
 features = ["alloc"]
 
+[dependencies.conquer-once]
+version = "0.2.0"
+default-features = false
+
 # This allows the VM to exit in a development environment
 [package.metadata.bootimage]
 test-args = ["-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio", "-display", "none"]
