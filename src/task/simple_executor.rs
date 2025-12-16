@@ -1,6 +1,6 @@
 use core::{
     ptr::null,
-    task::{RawWaker, RawWakerVTable, Waker},
+    task::{Context, Poll, RawWaker, RawWakerVTable, Waker},
 };
 
 use alloc::collections::vec_deque::VecDeque;
@@ -20,6 +20,17 @@ impl SimpleExecutor {
 
     pub fn spawn(&mut self, task: Task) {
         self.task_queue.push_back(task);
+    }
+
+    pub fn run(&mut self) {
+        while let Some(mut task) = self.task_queue.pop_front() {
+            let waker = dummy_waker();
+            let mut context = Context::from_waker(&waker);
+            match task.poll(&mut context) {
+                Poll::Ready(()) => {}
+                Poll::Pending => self.task_queue.push_back(task),
+            }
+        }
     }
 }
 
