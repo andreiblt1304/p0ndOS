@@ -16,7 +16,7 @@ impl Task {
         }
     }
 
-    fn poll(&mut self, context: &mut Context) -> Poll<()> {
+    pub fn poll(&mut self, context: &mut Context) -> Poll<()> {
         self.future.as_mut().poll(context)
     }
 }
