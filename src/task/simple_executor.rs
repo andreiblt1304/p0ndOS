@@ -5,7 +5,7 @@ use core::{
 
 use alloc::collections::vec_deque::VecDeque;
 
-use crate::task::task::Task;
+use crate::task::task_struct::Task;
 
 pub struct SimpleExecutor {
     task_queue: VecDeque<Task>,

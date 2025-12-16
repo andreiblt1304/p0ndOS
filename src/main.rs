@@ -11,7 +11,7 @@ use alloc::{boxed::Box, rc::Rc, vec::Vec};
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
 use p0nd_os::task::simple_executor::SimpleExecutor;
-use p0nd_os::task::task::Task;
+use p0nd_os::task::task_struct::Task;
 use p0nd_os::{memory::BootInfoFrameAllocator, println};
 
 // type-checked way to define the function as the kernel entry point
