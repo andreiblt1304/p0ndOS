@@ -10,6 +10,7 @@ use alloc::vec;
 use alloc::{boxed::Box, rc::Rc, vec::Vec};
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
+use p0nd_os::task::keyboard::print_keypresses;
 use p0nd_os::task::simple_executor::SimpleExecutor;
 use p0nd_os::task::task_struct::Task;
 use p0nd_os::{memory::BootInfoFrameAllocator, println};
@@ -54,6 +55,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let mut executor = SimpleExecutor::new();
     executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(print_keypresses()));
     executor.run();
 
     #[cfg(test)]
