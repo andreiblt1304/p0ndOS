@@ -10,8 +10,8 @@ use alloc::vec;
 use alloc::{boxed::Box, rc::Rc, vec::Vec};
 use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
+use p0nd_os::task::executor::Executor;
 use p0nd_os::task::keyboard::print_keypresses;
-use p0nd_os::task::simple_executor::SimpleExecutor;
 use p0nd_os::task::task_struct::Task;
 use p0nd_os::{memory::BootInfoFrameAllocator, println};
 
@@ -53,16 +53,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         Rc::strong_count(&cloned_reference)
     );
 
-    let mut executor = SimpleExecutor::new();
+    let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
     executor.spawn(Task::new(print_keypresses()));
     executor.run();
-
-    #[cfg(test)]
-    test_main();
-
-    println!("Nothing happened");
-    p0nd_os::hlt_loop();
 }
 
 async fn async_number() -> u32 {

@@ -6,7 +6,7 @@ use core::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct TaskId(u64);
+pub struct TaskId(u64);
 
 impl TaskId {
     fn new() -> Self {
@@ -17,7 +17,7 @@ impl TaskId {
 
 // can store different types of Futures with the `dyn` keyword == dynamically dispatched methods
 pub struct Task {
-    id: TaskId,
+    pub id: TaskId,
     future: Pin<Box<dyn Future<Output = ()>>>,
 }
 
