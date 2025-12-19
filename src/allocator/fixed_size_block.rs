@@ -27,6 +27,7 @@ impl FixedSizeBlockAllocator {
         }
     }
 
+    #[allow(clippy::missing_safety_doc)]
     pub unsafe fn init(&mut self, heap_start: usize, heap_size: usize) {
         unsafe {
             self.fallback_allocator.init(heap_start, heap_size);
@@ -38,6 +39,12 @@ impl FixedSizeBlockAllocator {
             Ok(ptr) => ptr.as_ptr(),
             Err(_) => ptr::null_mut(),
         }
+    }
+}
+
+impl Default for FixedSizeBlockAllocator {
+    fn default() -> Self {
+        FixedSizeBlockAllocator::new()
     }
 }
 

@@ -34,6 +34,12 @@ impl SimpleExecutor {
     }
 }
 
+impl Default for SimpleExecutor {
+    fn default() -> Self {
+        SimpleExecutor::new()
+    }
+}
+
 fn dummy_raw_waker() -> RawWaker {
     fn no_op(_: *const ()) {}
     fn clone(_: *const ()) -> RawWaker {

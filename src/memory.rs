@@ -8,6 +8,7 @@ use x86_64::{
 
 // unsafe because the caller must guarantee that
 // the complete physical memory is mapped to virtual one at the passed offset
+#[allow(clippy::missing_safety_doc)]
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
     unsafe {
         let level_4_table = active_level_4_table(physical_memory_offset);
@@ -32,6 +33,7 @@ pub struct BootInfoFrameAllocator {
 }
 
 impl BootInfoFrameAllocator {
+    #[allow(clippy::missing_safety_doc)]
     pub unsafe fn init(memory_map: &'static MemoryMap) -> Self {
         BootInfoFrameAllocator {
             memory_map,

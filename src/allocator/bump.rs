@@ -22,10 +22,17 @@ impl BumpAllocator {
         }
     }
 
+    #[allow(clippy::missing_safety_doc)]
     pub unsafe fn init(&mut self, heap_start: usize, heap_size: usize) {
         self.heap_start = heap_start;
         self.heap_end = self.heap_start + heap_size;
         self.next = heap_start;
+    }
+}
+
+impl Default for BumpAllocator {
+    fn default() -> Self {
+        BumpAllocator::new()
     }
 }
 

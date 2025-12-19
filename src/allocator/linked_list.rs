@@ -36,6 +36,7 @@ impl LinkedListAllocator {
         }
     }
 
+    #[allow(clippy::missing_safety_doc)]
     pub unsafe fn init(&mut self, heap_start: usize, heap_size: usize) {
         unsafe {
             self.add_free_region(heap_start, heap_size);
@@ -101,6 +102,12 @@ impl LinkedListAllocator {
         let size = layout.size().max(mem::size_of::<ListNode>());
 
         (size, layout.align())
+    }
+}
+
+impl Default for LinkedListAllocator {
+    fn default() -> Self {
+        LinkedListAllocator::new()
     }
 }
 

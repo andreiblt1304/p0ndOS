@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use pic8259::ChainedPics;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame, PageFaultErrorCode};
 
-use crate::{gdt, hlt_loop, print, println};
+use crate::{gdt, hlt_loop, println};
 
 // range 32-47 is chosen because there are the first free number after 32 exception slots
 pub const PIC_1_OFFSET: u8 = 32;

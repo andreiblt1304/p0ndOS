@@ -47,6 +47,12 @@ impl Stream for ScancodeStream {
     }
 }
 
+impl Default for ScancodeStream {
+    fn default() -> Self {
+        ScancodeStream::new()
+    }
+}
+
 pub(crate) fn add_scancode(scancode: u8) {
     if let Ok(queue) = SCANCODE_QUEUE.try_get() {
         if queue.push(scancode).is_err() {
